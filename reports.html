@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedReport Portal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>MedReport Portal</h1>
+    <nav>
+      <ul>
+        <li><a href="main.html">Home</a></li>
+        <li><a href="reports.html">Upload Report</a></li>
+        <li><a href="about.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="upload-section">
+    <h2>Upload Medical Report</h2>
+    <form>
+      <label for="patientName">Patient Name:</label>
+      <input type="text" id="patientName" name="patientName" required />
+
+      <label for="reportFile">Select Report (PDF):</label>
+      <input type="file" id="reportFile" name="reportFile" accept=".pdf" required />
+
+      <button type="submit">Upload</button>
+    </form>
+  </section>
+
+  <section class="report-list">
+    <h2>Recent Reports</h2>
+    <ul>
+      <li>John Doe - Blood Test Report.pdf</li>
+      <li>Jane Smith - MRI Scan.pdf</li>
+      <li>Rahul Kumar - X-Ray Report.pdf</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 MedReport Portal. All rights reserved.</p>
+  </footer>
+</body>
+</html>

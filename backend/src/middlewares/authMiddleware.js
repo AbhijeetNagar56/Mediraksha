@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv'
+dotenv.config();
+const JWT_SECRET = process.env.JWT;
 
-const JWT_SECRET = "abcdefgh";
 
-// Middleware to protect routes
+
 const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.split(" ")[1];
   if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });

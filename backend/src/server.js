@@ -1,10 +1,9 @@
 import express from "express"
 import dotenv from "dotenv"
-import cors from 'cors'
-import router from "./routes/registration.js";
-import mainRoute from "./routes/user.js"
-import { connectDB } from "./config/dataBase.js";
-
+import router from "./routes/auth.js";
+import mainRoute from "./routes/dash.js"
+import { connectDB } from "./config/db.js";
+import authMiddleware from "./middlewares/authMiddleware.js";
 
 
 dotenv.config();
@@ -14,17 +13,17 @@ const port = process.env.PORT || 3000;
 
 
 app.use(express.json());
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.status(200).json({ message: "home page" });
 });
 
 
-app.use('/user', router);
-app.use('/home', mainRoute);
+app.use('/api/auth', router);
+app.use('/api/dashboard', authMiddleware, mainRoute);
 
 
 connectDB().then(() => {
     app.listen(port, () => {
-        console.log(`Server is running at http://localhost:${port}`);
+        console.log(`Server is running at port:${port}`);
     });
 });

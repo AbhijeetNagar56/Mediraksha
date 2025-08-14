@@ -9,7 +9,7 @@ import MyDetail from './components/MyDet';
 
 export default function App() {
   return (
-    <>
+    <div>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/auth" element={<Auth />} />
@@ -18,7 +18,7 @@ export default function App() {
         <Route path='/map' element={<MapComponent/>} />
         <Route path='/upload' element={<Upload />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

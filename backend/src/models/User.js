@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const formStructure = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -9,17 +9,17 @@ const formStructure = new mongoose.Schema(
     },
     email: {
       type: String,
+      required: true,
       unique: true,
-      required:true
     },
     password: {
       type: String,
       required: true,
     }
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
-const User = mongoose.model("MediRakshaUser", formStructure);
+const User = mongoose.model("User", schema);
 
 export default User;

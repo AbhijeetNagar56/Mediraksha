@@ -1,9 +1,5 @@
 import jwt from "jsonwebtoken";
-import dotenv from 'dotenv'
-dotenv.config();
 const JWT_SECRET = process.env.JWT;
-
-
 
 const authMiddleware = (req, res, next) => {
   const token = req.header('Authorization')?.split(" ")[1];
@@ -14,11 +10,10 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded.id;
     next();
   } catch (err) {
+    console.log('error is ', err);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
-
-
 
 
 export default authMiddleware;

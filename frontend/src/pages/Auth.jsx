@@ -32,7 +32,7 @@ const auth = () => {
       localStorage.setItem('token', token);
 
       console.log('Login successful:', response.data);
-      window.location.href = '/';
+      window.location.href = '/details';
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
     }

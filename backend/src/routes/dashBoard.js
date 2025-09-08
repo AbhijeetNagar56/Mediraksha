@@ -1,50 +1,35 @@
 import express from 'express';
-import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
-import { connectDB } from '../config/dataBase.js';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import { GridFsStorage } from 'multer-gridfs-storage';
-import Grid from 'gridfs-stream';
+import { GridFSBucket } from 'mongodb';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT;
 
-// MongoDB Connection
+// MongoDB connection
 const conn = mongoose.connection;
-let gfs;
+let bucket;
 
 conn.once('open', () => {
-  gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection('uploads'); // bucket name
+  bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
 });
 
-// Multer GridFS Storage Setup
-const storage = new GridFsStorage({
-  url: process.env.MONGO_URI, // your MongoDB connection string
-  file: (req, file) => {
-    return {
-      filename: `${Date.now()}-${file.originalname}`,
-      bucketName: 'uploads',
-      metadata: { userId: req.user }, // attach userId for filtering
-    };
-  },
-});
-
-const upload = multer({ storage });
-
+// ✅ Middleware to verify JWT
 const verifyToken = (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];
   if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded.id;
+    req.userId = decoded.id;
     next();
   } catch (err) {
     return res.status(401).json({ msg: 'Invalid token' });
   }
 };
+
 
 
 router.get('/', async (req, res) => {
@@ -150,37 +135,85 @@ router.patch('/update', async (req, res) => {
     }
 });
 
+// ✅ Multer setup
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// ✅ File Upload
-router.post('/upload',verifyToken, upload.single('report'), (req, res) => {
-  res.status(201).json({ msg: 'File uploaded successfully', file: req.file });
-});
+/* -------------------------------
+   FILE ROUTES
+--------------------------------*/
 
-// ✅ Get all uploaded files
-router.get('/files',verifyToken, async (req, res) => {
+// Upload a file
+router.post('/upload', verifyToken, upload.single('report'), async (req, res) => {
   try {
-    gfs.files.find({ 'metadata.userId': req.user }).toArray((err, files) => {
-      if (!files || files.length === 0) return res.status(404).json({ msg: 'No files found' });
-      res.json(files);
+    const uploadStream = bucket.openUploadStream(req.file.originalname, {
+      metadata: { userId: req.userId },
+    });
+    uploadStream.end(req.file.buffer);
+
+    uploadStream.on('finish', (file) => {
+      res.status(201).json({ msg: 'File uploaded successfully', file });
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: 'Upload failed' });
   }
 });
 
-// ✅ Download file by ID
-router.get('/file/:id',verifyToken, async (req, res) => {
+// List user files
+router.get('/files', verifyToken, async (req, res) => {
   try {
-    const file = await gfs.files.findOne({ _id: new mongoose.Types.ObjectId(req.params.id) });
-    if (!file) return res.status(404).json({ msg: 'File not found' });
-
-    const readstream = gfs.createReadStream(file.filename);
-    readstream.pipe(res);
+    const files = await bucket.find({ 'metadata.userId': req.userId }).toArray();
+    if (!files.length) return res.status(404).json({ msg: 'No files found' });
+    res.json(files);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
+
+// Download file
+router.get('/file/:id', verifyToken, async (req, res) => {
+  try {
+    const file = await bucket
+      .find({ _id: new mongoose.Types.ObjectId(req.params.id) })
+      .toArray();
+    if (!file.length) return res.status(404).json({ msg: 'File not found' });
+
+    // Ownership check
+    if (file[0].metadata.userId !== req.userId) {
+      return res.status(403).json({ msg: 'Access denied' });
+    }
+
+    const downloadStream = bucket.openDownloadStream(file[0]._id);
+    downloadStream.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+
+// Delete file
+router.delete('/file/:id', verifyToken, async (req, res) => {
+  try {
+    const file = await bucket
+      .find({ _id: new mongoose.Types.ObjectId(req.params.id) })
+      .toArray();
+    if (!file.length) return res.status(404).json({ msg: 'File not found' });
+
+    // Ownership check
+    if (file[0].metadata.userId !== req.userId) {
+      return res.status(403).json({ msg: 'Access denied' });
+    }
+
+    await bucket.delete(new mongoose.Types.ObjectId(req.params.id));
+    res.status(200).json({ msg: 'File deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
 
 export default router;

@@ -9,9 +9,9 @@ const auth = () => {
   const handleSignup = async () => {
     try {
       const response = await axiosInstance.post('/auth', {
-        name:name,
-        email:email,
-        password:password
+        name: name,
+        email: email,
+        password: password
       });
       console.log('signup successful:', response.data);
       handleLogin();
@@ -22,17 +22,32 @@ const auth = () => {
   const handleLogin = async () => {
     try {
       const response = await axiosInstance.post('/auth/login', {
-        name:name,
-        email:email,
-        password:password
+        name: name,
+        email: email,
+        password: password
       });
       const token = response.data.token;
 
       // ✅ Save token in localStorage
       localStorage.setItem('token', token);
 
+      const res = await fetch("http://localhost:5000/api/dashBoard", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
       console.log('Login successful:', response.data);
-      window.location.href = '/details';
+      if(!(data.gender) || !(data.age)){
+        window.location.href = '/details';
+      } else {
+        window.location.href = '/';
+      }
+      
+      
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
     }
@@ -41,7 +56,7 @@ const auth = () => {
 
   if (su) {
     return (
-      
+
       <div data-theme="forest" className="min-h-screen flex items-center justify-center bg-base-200">
         <div className="card w-full max-w-sm shadow-xl bg-base-100">
           <div className="card-body">
@@ -51,24 +66,24 @@ const auth = () => {
               <div className="label">
                 <span className="label-text">Name</span>
               </div>
-              <input type="text" value={ name } onChange={(e) => setName(e.target.value)} placeholder="Name" className="input input-bordered w-full" />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="input input-bordered w-full" />
             </label>
 
             <label className="form-control w-full mb-4">
               <div className="label">
                 <span className="label-text">Email</span>
               </div>
-              <input type="email" value={ email } onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
             </label>
 
             <label className="form-control w-full mb-6">
               <div className="label">
                 <span className="label-text">Password</span>
               </div>
-              <input type="password" value={ password } onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
             </label>
 
-            <button onClick={ handleSignup } className="btn btn-primary w-full">Sign Up</button>
+            <button onClick={handleSignup} className="btn btn-primary w-full">Sign Up</button>
             <p className="justify-self-start" onClick={() => { setsu(false) }}>Already an account?</p>
           </div>
         </div>
@@ -85,17 +100,17 @@ const auth = () => {
               <div className="label">
                 <span className="label-text">Email</span>
               </div>
-              <input type="email" value={ email } onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
             </label>
 
             <label className="form-control w-full mb-6">
               <div className="label">
                 <span className="label-text">Password</span>
               </div>
-              <input type="password" value={ password } onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
             </label>
 
-            <button onClick={ handleLogin } className="btn btn-accent w-full">Log In</button>
+            <button onClick={handleLogin} className="btn btn-accent w-full">Log In</button>
             <p onClick={() => { setsu(true) }} className="justify-self-start">Don't have an account?</p>
           </div>
         </div>

@@ -32,7 +32,7 @@ export async function getUser(req, res) {
         if(!user) return res.status(404).json({message:"user not found"});
         const passCorrect = await bcrypt.compare(password, user.password);
         if(!passCorrect) return res.status(400).json({msg:'password not correct'});
-        const token = jwt.sign({id:user._id}, JWT_SECRET, {expiresIn: '1h'});
+        const token = jwt.sign({id:user._id}, JWT_SECRET, {expiresIn: '2d'});
         res.json({ token });
     } catch (error) {
         console.log("Error in the app ", error);

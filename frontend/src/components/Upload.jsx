@@ -2,19 +2,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import PdfViewer from './Pdfviewer';
 
 export default function UploadReport() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [files, setFiles] = useState([]);
+  const [previewFile, setPreviewFile] = useState(null); // Blob URL for preview
+  const [previewType, setPreviewType] = useState(null); // image or pdf
 
-  // Get token from localStorage
   const token = localStorage.getItem('token');
+  const API_URL = 'http://localhost:5000/api/dashBoard';
 
-  // Fetch uploaded files
   const fetchFiles = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/dashBoard/files', {
+      const res = await axios.get(`${API_URL}/files`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFiles(res.data);
@@ -25,9 +27,7 @@ export default function UploadReport() {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchFiles();
-    }
+    if (token) fetchFiles();
   }, [token]);
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
@@ -39,22 +39,56 @@ export default function UploadReport() {
     formData.append('report', file);
 
     try {
-      const res = await axios.post(
-        'http://localhost:5000/api/dashBoard/upload',
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const res = await axios.post(`${API_URL}/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       setMessage(res.data.msg);
       setFile(null);
-      fetchFiles(); // refresh file list
+      fetchFiles();
     } catch (error) {
       console.error(error);
       setMessage('Upload failed');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/file/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage('File deleted');
+      fetchFiles();
+    } catch (error) {
+      console.error(error);
+      setMessage('Delete failed');
+    }
+  };
+
+  // ✅ Fetch file as blob for preview
+  const handlePreview = async (id, filename) => {
+    try {
+      const res = await axios.get(`${API_URL}/file/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob', // get as blob
+      });
+
+      const blob = new Blob([res.data], { type: res.data.type });
+      const url = URL.createObjectURL(blob);
+
+      if (/\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(filename)) {
+        setPreviewType('image');
+      } else if (/\.pdf$/i.test(filename)) {
+        setPreviewType('pdf');
+      } else {
+        setPreviewType('other');
+      }
+
+      setPreviewFile(url);
+    } catch (err) {
+      console.error('Preview error:', err);
     }
   };
 
@@ -78,15 +112,22 @@ export default function UploadReport() {
           {files.length > 0 ? (
             <ul className="list-disc pl-5">
               {files.map((f) => (
-                <li key={f._id} className="mb-2">
-                  <a
-                    href={`http://localhost:5000/api/dashBoard/file/${f._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 underline"
-                  >
-                    {f.filename}
-                  </a>
+                <li key={f._id} className="mb-4">
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="text-blue-500 underline"
+                      onClick={() => handlePreview(f._id, f.filename)}
+                    >
+                      Preview
+                    </button>
+                    <span>{f.filename}</span>
+                    <button
+                      className="btn btn-error btn-sm"
+                      onClick={() => handleDelete(f._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -95,6 +136,49 @@ export default function UploadReport() {
           )}
         </div>
       </div>
+
+      {/* Modal Preview */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-4 max-w-4xl w-full h-[80vh] relative">
+            <button
+              className="absolute top-2 right-2 btn btn-sm btn-error"
+              onClick={() => {
+                URL.revokeObjectURL(previewFile);
+                setPreviewFile(null);
+              }}
+            >
+              Close
+            </button>
+
+            {previewType === 'image' && (
+              <img
+                src={previewFile}
+                alt="Preview"
+                className="w-full h-full object-contain"
+              />
+            )}
+            {previewType === 'pdf' && (
+              <PdfViewer fileUrl={previewFile} />
+            )}
+
+            {previewType === 'other' && (
+              <p className="text-center mt-10">
+                File preview not supported.{' '}
+                <a
+                  href={previewFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 underline"
+                >
+                  Download instead
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

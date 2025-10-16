@@ -1,122 +1,175 @@
 import { useState } from "react";
 import axiosInstance from "../api/axios";
-const auth = () => {
+import { Link } from "react-router"; // 
+import { ArrowLeft } from "lucide-react"; //
+
+const Auth = () => {
   const [su, setsu] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
+  // Handle Signup
   const handleSignup = async () => {
     try {
-      const response = await axiosInstance.post('/auth', {
-        name: name,
-        email: email,
-        password: password
+      const response = await axiosInstance.post('/api/auth', {
+        name,
+        email,
+        password
       });
-      console.log('signup successful:', response.data);
-      handleLogin();
+      console.log('Signup successful:', response.data);
+      handleLogin(); // Auto-login after signup
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
+      console.error('Signup error:', error.response?.data || error.message);
     }
   };
+  
+  // Handle Login
   const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post('/auth/login', {
-        name: name,
-        email: email,
-        password: password
+      const response = await axiosInstance.post('/api/auth/login', {
+        name,
+        email,
+        password
       });
+
       const token = response.data.token;
 
-      // ✅ Save token in localStorage
+      // Save token in localStorage
       localStorage.setItem('token', token);
 
-      const res = await fetch("http://localhost:5000/api/dashBoard", {
-        method: "GET",
+      // Use Axios for dashboard request
+      const res = await axiosInstance.get("/api/dashBoard", {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const data = await res.json();
+      const data = res.data;
       console.log('Login successful:', response.data);
-      if(!(data.gender) || !(data.age)){
+
+      // 🔹 Redirect based on user details
+      if (!(data.gender) || !(data.age)) {
         window.location.href = '/details';
       } else {
         window.location.href = '/';
       }
-      
-      
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
     }
   };
 
-
+  // 🔹 UI Rendering
   if (su) {
+    // Signup Form
     return (
-
-      <div data-theme="forest" className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
         <div className="card w-full max-w-sm shadow-xl bg-base-100">
           <div className="card-body">
-            <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+            <div className="flex items-center justify-between mb-4">
+              <Link to="/" className="text-gray-500 hover:text-gray-700">
+                <ArrowLeft size={24} />
+              </Link>
+              <h2 className="text-2xl font-bold text-center flex-grow">Sign Up</h2>
+              <div className="w-6"></div> {/* Spacer to balance the title */}
+            </div>
 
             <label className="form-control w-full mb-4">
               <div className="label">
                 <span className="label-text">Name</span>
               </div>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="input input-bordered w-full" />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+                className="input input-bordered w-full"
+              />
             </label>
 
             <label className="form-control w-full mb-4">
               <div className="label">
                 <span className="label-text">Email</span>
               </div>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="input input-bordered w-full"
+              />
             </label>
 
             <label className="form-control w-full mb-6">
               <div className="label">
                 <span className="label-text">Password</span>
               </div>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="input input-bordered w-full"
+              />
             </label>
 
             <button onClick={handleSignup} className="btn btn-primary w-full">Sign Up</button>
-            <p className="justify-self-start" onClick={() => { setsu(false) }}>Already an account?</p>
+            <p className="justify-self-start cursor-pointer" onClick={() => setsu(false)}>
+              Already have an account?
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   } else {
+    // Login Form
     return (
-      <div data-theme="forest" className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
         <div className="card w-full max-w-sm shadow-xl bg-base-100">
           <div className="card-body">
-            <h2 className="text-2xl font-bold text-center">Log In</h2>
+            <div className="flex items-center justify-between mb-4">
+              <Link to="/" className="text-gray-500 hover:text-gray-700">
+                <ArrowLeft size={24} />
+              </Link>
+              <h2 className="text-2xl font-bold text-center flex-grow">Log In</h2>
+              <div className="w-6"></div> {/* Spacer to balance the title */}
+            </div>
 
             <label className="form-control w-full mb-4">
               <div className="label">
                 <span className="label-text">Email</span>
               </div>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input input-bordered w-full" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="input input-bordered w-full"
+              />
             </label>
 
             <label className="form-control w-full mb-6">
               <div className="label">
                 <span className="label-text">Password</span>
               </div>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input input-bordered w-full" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="input input-bordered w-full"
+              />
             </label>
 
             <button onClick={handleLogin} className="btn btn-accent w-full">Log In</button>
-            <p onClick={() => { setsu(true) }} className="justify-self-start">Don't have an account?</p>
+            <p className="justify-self-start cursor-pointer" onClick={() => setsu(true)}>
+              Don't have an account?
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 };
 
-export default auth;
+export default Auth;

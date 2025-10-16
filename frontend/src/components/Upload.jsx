@@ -95,7 +95,7 @@ export default function UploadReport() {
   return (
     <>
       <Navbar />
-      <div className="card bg-base-200 p-4 shadow-md mt-30">
+      <div className="card bg-base-200 p-4 shadow-md w-[70%] justify-self-center my-30">
         <h2 className="text-xl font-semibold mb-4">Upload Medical Report</h2>
         <input
           onChange={handleFileChange}
@@ -183,3 +183,4 @@ export default function UploadReport() {
     </>
   );
 }
+

@@ -4,6 +4,10 @@ import multer from 'multer';
 import { GridFSBucket } from 'mongodb';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { getPatients } from '../controllers/dashController.js';
+import { addAvailability, getAvailability, deleteAvailability } from "../controllers/availabilityController.js";
+import { addRoom, addEquipment, getResources, checkResourceAvailability } from "../controllers/resourceController.js";
+import { createSchedule, getSchedules, deleteSchedule } from '../controllers/scheduleController.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT;
@@ -214,6 +218,26 @@ router.delete('/file/:id', verifyToken, async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 });
+
+router.get('/patients', getPatients);
+
+
+router.post("/availability", addAvailability);
+router.get("/availability", getAvailability);
+router.delete("/availability/:id", deleteAvailability);
+
+
+router.post("/resources/room", addRoom);
+router.post("/resources/equipment", addEquipment);
+router.get("/resources", getResources);
+router.post("/resources/check", checkResourceAvailability);
+
+
+
+router.get('/schedule/all', getSchedules);
+router.post("/schedule/create", createSchedule);
+router.delete("/schedule/delete/:id", deleteSchedule);
+
 
 
 export default router;

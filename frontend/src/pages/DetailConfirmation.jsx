@@ -10,7 +10,7 @@ const UserDetails = () => {
       const token = localStorage.getItem("token"); // ✅ Get saved token
 
       const response = await axiosInstance.patch(
-        "/api/dashBoard/details", // 👈 Backend endpoint
+        "/dashBoard/details", // 👈 Backend endpoint
         { gender, age },
         {
           headers: {

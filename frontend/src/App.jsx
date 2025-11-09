@@ -51,7 +51,7 @@ export default function App() {
     // Wait for the duration of the animation (2500ms) before rendering the main app
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500);
+    }, 3000);
 
     return () => clearTimeout(timer); // Cleanup timer on unmount
   }, []);

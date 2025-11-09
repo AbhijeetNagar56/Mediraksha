@@ -28,7 +28,6 @@ app.get("/api", (_, res) => {
 // other routes
 app.use("/api/auth", authRoutes);
 app.use("/api/dashBoard", authMiddleware, dashBoard);
-app.use("/api/schedule", scheduleRoutes);
 
 
 

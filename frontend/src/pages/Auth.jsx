@@ -12,7 +12,7 @@ const Auth = () => {
   // Handle Signup
   const handleSignup = async () => {
     try {
-      const response = await axiosInstance.post('/api/auth', {
+      const response = await axiosInstance.post('/auth', {
         name,
         email,
         password
@@ -27,7 +27,7 @@ const Auth = () => {
   // Handle Login
   const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post('/api/auth/login', {
+      const response = await axiosInstance.post('/auth/login', {
         name,
         email,
         password
@@ -39,7 +39,7 @@ const Auth = () => {
       localStorage.setItem('token', token);
 
       // Use Axios for dashboard request
-      const res = await axiosInstance.get("/api/dashBoard", {
+      const res = await axiosInstance.get("/dashBoard", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

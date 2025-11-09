@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+if (process.env.NODE_ENV !== 'production') {
+  axios.defaults.baseURL = 'http://localhost:5000/api';
+} else {
+  axios.defaults.baseURL = '/api';
+}
+
+
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000', // your backend base URL
+  baseURL: axios.defaults.baseURL, // your backend base URL
 });
 
 axiosInstance.interceptors.request.use((config) => {

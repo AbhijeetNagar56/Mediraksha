@@ -6,7 +6,6 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import dashBoard from "./routes/dashBoard.js";
 import authMiddleware from "./middlewares/authMiddleware.js";
-import scheduleRoutes from './routes/sheduleRoutes.js'
 
 dotenv.config();
 const app = express();

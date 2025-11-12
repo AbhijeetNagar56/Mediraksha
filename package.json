@@ -4,17 +4,19 @@
   "description": "healthcares app",
   "homepage": "",
   "bugs": {
-    "url": ""
+    "url": "mailto:support@mediraksha.com"
   },
   "repository": {
     "type": "git",
     "url": ""
   },
   "license": "ISC",
-  "author": "",
+  "author": "abhi",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Starting the website\" && cd backend && npm start"
+    "test": "echo \"Starting the website\" && cd backend && npm start",
+    "start": "cd backend && npm run dev",
+    "build": "npm i --prefix backend && npm i --prefix frontend && npm run build --prefix frontend"
   }
 }

@@ -48,12 +48,11 @@ export default function App() {
 
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    // Wait for the duration of the animation (2500ms) before rendering the main app
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 3000);
 
-    return () => clearTimeout(timer); // Cleanup timer on unmount
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {

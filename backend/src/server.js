@@ -59,14 +59,12 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend
 app.use(
   express.static(
     path.join(__dirname, "../../frontend/dist")
   )
 );
 
-// ✅ API Routes
 app.get("/api", (_, res) => {
   res.status(200).json({ msg: "Welcome to MediRaksha" });
 });
@@ -74,7 +72,7 @@ app.get("/api", (_, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/dashBoard", authMiddleware, dashBoard);
 
-// ✅ EXPRESS 5 SAFE CATCH-ALL
+
 app.get("/*", (req, res) => {
   res.sendFile(
     path.join(__dirname, "../../frontend/dist/index.html")

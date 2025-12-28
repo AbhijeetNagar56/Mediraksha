@@ -10,7 +10,7 @@ import { addRoom, addEquipment, getResources, checkResourceAvailability } from "
 import { createSchedule, getSchedules, deleteSchedule } from '../controllers/scheduleController.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // MongoDB connection
 const conn = mongoose.connection;

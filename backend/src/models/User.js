@@ -15,6 +15,10 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    userType: {
+      type: String,
+      required: true,
+    },
     gender: {
       type: String,
       required: false,
@@ -27,5 +31,5 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("SIH", schema);
+const User = mongoose.model("UserMR", schema);
 export default User;

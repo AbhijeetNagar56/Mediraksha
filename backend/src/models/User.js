@@ -15,10 +15,6 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userType: {
-      type: String,
-      required: true,
-    },
     gender: {
       type: String,
       required: false,

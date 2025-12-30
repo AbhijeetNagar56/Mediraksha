@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import PdfViewer from './Pdfviewer';
 
 export default function UploadReport() {
   const [file, setFile] = useState(null);
@@ -12,7 +11,7 @@ export default function UploadReport() {
   const [previewType, setPreviewType] = useState(null); // image or pdf
 
   const token = localStorage.getItem('token');
-  const API_URL = 'http://localhost:5000/api/dashBoard';
+  const API_URL = 'http://localhost:5000/api/home';
 
   const fetchFiles = async () => {
     try {

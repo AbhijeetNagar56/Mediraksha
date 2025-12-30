@@ -15,7 +15,7 @@ const Auth = () => {
       const response = await axiosInstance.post('/auth', {
         name,
         email,
-        password
+        password,
       });
       console.log('Signup successful:', response.data);
       handleLogin(); // Auto-login after signup
@@ -30,7 +30,7 @@ const Auth = () => {
       const response = await axiosInstance.post('/auth/login', {
         name,
         email,
-        password
+        password,
       });
 
       const token = response.data.token;
@@ -39,7 +39,7 @@ const Auth = () => {
       localStorage.setItem('token', token);
 
       // Use Axios for dashboard request
-      const res = await axiosInstance.get("/dashBoard", {
+      const res = await axiosInstance.get("/home", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,12 +48,12 @@ const Auth = () => {
       const data = res.data;
       console.log('Login successful:', response.data);
 
-      // 🔹 Redirect based on user details
       if (!(data.gender) || !(data.age)) {
         window.location.href = '/details';
       } else {
         window.location.href = '/';
       }
+
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
     }

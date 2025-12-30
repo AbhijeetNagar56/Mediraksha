@@ -1,11 +1,17 @@
 import { Link } from "react-router";
-import logo from '../assets/logo.png'
+import logo from "../assets/logo.png"; // adjust path as needed
+
 
 export default function Navbar() {
-  // const acc = () => {
-  //   const token = localStorage.getItem("token");
-  //   window.location.href = "/auth";
-  // };
+  const acc = () => {
+    const token = localStorage.getItem("token");
+    if(!token) {
+      window.location.href = "/auth";
+    } else {
+      window.location.href = "/detail";
+    }
+    
+  };
 
   return (
     <div className="navbar bg-base-100 shadow-sm relative z-50">
@@ -44,15 +50,6 @@ export default function Navbar() {
                   <li>
                     <Link to="/upload">Upload report</Link>
                   </li>
-                  <li>
-                    <Link to="/schedule">Book an appointment</Link>
-                  </li>
-                  <li>
-                    <Link to="/availability">Practioner availability</Link>
-                  </li>
-                  <li>
-                    <Link to="/resource">Bed availability</Link>
-                  </li>
                 </ul>
               </details>
             </li>
@@ -61,7 +58,7 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-        <img src={logo} alt="icon" className="w-[30px]" />
+        <img src={logo} alt="icon" className="w-7.5" />
         <a className="mx-2 font-bold text-2xl">MediRaksha</a>
       </div>
       <div className="navbar-center hidden lg:flex">
@@ -79,15 +76,6 @@ export default function Navbar() {
                 <li>
                   <Link to="/upload">Upload report</Link>
                 </li>
-                <li>
-                  <Link to="/schedule">Book an appointment</Link>
-                </li>
-                <li>
-                  <Link to="/availability">Practioner availability</Link>
-                </li>
-                <li>
-                  <Link to="/resource">Bed availability</Link>
-                </li>
               </ul>
             </details>
           </li>
@@ -97,8 +85,8 @@ export default function Navbar() {
         </ul>
       </div>
       <div className="navbar-end">
-        <div className="btn">
-          <Link to='/auth'>My Profile</Link>
+        <div className="btn" onClick={acc}>
+          My Profile
         </div>
       </div>
     </div>

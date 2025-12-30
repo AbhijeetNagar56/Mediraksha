@@ -27,7 +27,7 @@ export default function Dashboard() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      <main className="grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 space-y-12">
         
         {/* Personalized Welcome Banner */}
         <div className="hero rounded-2xl bg-base-200 p-8 shadow-xl">

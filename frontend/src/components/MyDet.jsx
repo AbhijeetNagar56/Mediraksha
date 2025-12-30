@@ -25,7 +25,7 @@ export default function MyDetail() {
         }
 
         // 🔹 Axios GET request
-        const res = await axiosInstance.get("/api/dashBoard", {
+        const res = await axiosInstance.get("/home", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -76,7 +76,7 @@ export default function MyDetail() {
 
       // 🔹 Axios PATCH request
       const res = await axiosInstance.patch(
-        "/api/dashBoard/update",
+        "/home/update",
         {
           gender: formData.gender,
           age: formData.age,

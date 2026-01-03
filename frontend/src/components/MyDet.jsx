@@ -18,18 +18,9 @@ export default function MyDetail() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/auth");
-          return;
-        }
 
         // 🔹 Axios GET request
-        const res = await axiosInstance.get("/home", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axiosInstance.get("/home");
 
         const data = res.data;
         setUser(data);
@@ -41,6 +32,7 @@ export default function MyDetail() {
         });
       } catch (error) {
         console.error(error.response?.data?.msg || "Error fetching user details");
+        navigate("/auth");
       } finally {
         setLoading(false);
       }
@@ -49,8 +41,8 @@ export default function MyDetail() {
     fetchUser();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    await axiosInstance.post('/auth/logout');
     navigate("/");
   };
 
@@ -75,19 +67,11 @@ export default function MyDetail() {
       const token = localStorage.getItem("token");
 
       // 🔹 Axios PATCH request
-      const res = await axiosInstance.patch(
-        "/home/update",
-        {
-          gender: formData.gender,
-          age: formData.age,
-          name: formData.name, // optional: allow name editing too
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axiosInstance.patch("/home/update", {
+        gender: formData.gender,
+        age: formData.age,
+        name: formData.name, // optional: allow name editing too
+      });
 
       const data = res.data;
       alert("Details updated successfully!");

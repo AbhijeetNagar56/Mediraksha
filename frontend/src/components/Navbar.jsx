@@ -4,13 +4,7 @@ import logo from "../assets/logo.png"; // adjust path as needed
 
 export default function Navbar() {
   const acc = () => {
-    const token = localStorage.getItem("token");
-    if(!token) {
-      window.location.href = "/auth";
-    } else {
       window.location.href = "/detail";
-    }
-    
   };
 
   return (

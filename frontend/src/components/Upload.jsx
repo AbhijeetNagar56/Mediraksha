@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -7,17 +7,14 @@ export default function UploadReport() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [files, setFiles] = useState([]);
-  const [previewFile, setPreviewFile] = useState(null); // Blob URL for preview
-  const [previewType, setPreviewType] = useState(null); // image or pdf
+  const [previewFile, setPreviewFile] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
 
-  const token = localStorage.getItem('token');
-  const API_URL = 'http://localhost:5000/api/home';
+  const API_URL = '/home'; // baseURL already includes /api
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(`${API_URL}/files`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axiosInstance.get(`${API_URL}/files`);
       setFiles(res.data);
     } catch (error) {
       console.error(error);
@@ -26,8 +23,8 @@ export default function UploadReport() {
   };
 
   useEffect(() => {
-    if (token) fetchFiles();
-  }, [token]);
+    fetchFiles();
+  }, []);
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
@@ -38,12 +35,16 @@ export default function UploadReport() {
     formData.append('report', file);
 
     try {
-      const res = await axios.post(`${API_URL}/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await axiosInstance.post(
+        `${API_URL}/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
       setMessage(res.data.msg);
       setFile(null);
       fetchFiles();
@@ -55,9 +56,7 @@ export default function UploadReport() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/file/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axiosInstance.delete(`${API_URL}/file/${id}`);
       setMessage('File deleted');
       fetchFiles();
     } catch (error) {
@@ -66,13 +65,12 @@ export default function UploadReport() {
     }
   };
 
-  // ✅ Fetch file as blob for preview
   const handlePreview = async (id, filename) => {
     try {
-      const res = await axios.get(`${API_URL}/file/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob', // get as blob
-      });
+      const res = await axiosInstance.get(
+        `${API_URL}/file/${id}`,
+        { responseType: 'blob' }
+      );
 
       const blob = new Blob([res.data], { type: res.data.type });
       const url = URL.createObjectURL(blob);
@@ -94,20 +92,25 @@ export default function UploadReport() {
   return (
     <>
       <Navbar />
+
       <div className="card bg-base-200 p-4 shadow-md w-[70%] justify-self-center my-30">
         <h2 className="text-xl font-semibold mb-4">Upload Medical Report</h2>
+
         <input
           onChange={handleFileChange}
           type="file"
           className="file-input file-input-bordered w-full"
         />
+
         <button className="btn btn-primary mt-4" onClick={handleUpload}>
           Upload
         </button>
+
         {message && <p className="mt-2 text-green-600">{message}</p>}
 
         <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">Uploaded Files</h3>
+
           {files.length > 0 ? (
             <ul className="list-disc pl-5">
               {files.map((f) => (
@@ -119,7 +122,9 @@ export default function UploadReport() {
                     >
                       Preview
                     </button>
+
                     <span>{f.filename}</span>
+
                     <button
                       className="btn btn-error btn-sm"
                       onClick={() => handleDelete(f._id)}
@@ -136,7 +141,7 @@ export default function UploadReport() {
         </div>
       </div>
 
-      {/* Modal Preview */}
+      {/* Preview Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-4 max-w-4xl w-full h-[80vh] relative">
@@ -157,6 +162,7 @@ export default function UploadReport() {
                 className="w-full h-full object-contain"
               />
             )}
+
             {previewType === 'pdf' && (
               <PdfViewer fileUrl={previewFile} />
             )}
@@ -182,4 +188,3 @@ export default function UploadReport() {
     </>
   );
 }
-

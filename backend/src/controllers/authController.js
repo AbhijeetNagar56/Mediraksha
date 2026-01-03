@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import doctor from '../models/Doctor.js'
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
@@ -15,7 +16,20 @@ export async function createUser(req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ name, email, password: hashedPassword });
         await newUser.save();
-        res.status(201).json(newUser);
+
+        const token = jwt.sign({ id: newUser._id }, JWT_SECRET, {
+            expiresIn: "2d",
+        });
+
+        // set cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+        });
+
+        res.status(201).json({msg:"User created successfully"});
     } catch (error) {
         console.log("Error in the app ", error);
         res.status(500).json({ message: "Internal Server error" });
@@ -26,13 +40,24 @@ export async function createUser(req, res) {
 // sign in
 export async function getUser(req, res) {
     try {
-        const { name, email, password, userType } = req.body;
+        const { name, email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "user not found" });
         const passCorrect = await bcrypt.compare(password, user.password);
         if (!passCorrect) return res.status(400).json({ msg: 'password not correct' });
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '2d' });
-        res.json({token});
+
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, {
+            expiresIn: "2d",
+        });
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000,
+        });
+
+        res.json({ msg: "Login successful" });
     } catch (error) {
         console.log("Error in the app ", error);
         res.status(500).json({ message: "Internal Server error" });

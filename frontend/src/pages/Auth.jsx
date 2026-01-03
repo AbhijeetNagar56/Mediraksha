@@ -12,52 +12,47 @@ const Auth = () => {
   // Handle Signup
   const handleSignup = async () => {
     try {
-      const response = await axiosInstance.post('/auth', {
+      await axiosInstance.post("/auth", {
         name,
         email,
         password,
       });
-      console.log('Signup successful:', response.data);
-      handleLogin(); // Auto-login after signup
+
+      console.log("Signup successful");
+      handleLogin(); // auto-login (cookie-based)
     } catch (error) {
-      console.error('Signup error:', error.response?.data || error.message);
+      console.error("Signup error:", error.response?.data || error.message);
     }
   };
+
   
   // Handle Login
   const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post('/auth/login', {
-        name,
+      await axiosInstance.post("/auth/login", {
         email,
         password,
       });
 
-      const token = response.data.token;
+      // ✅ No token handling here
 
-      // Save token in localStorage
-      localStorage.setItem('token', token);
-
-      // Use Axios for dashboard request
-      const res = await axiosInstance.get("/home", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Call protected route (cookie will be sent automatically)
+      const res = await axiosInstance.get("/home");
 
       const data = res.data;
-      console.log('Login successful:', response.data);
+      console.log("Login successful");
 
-      if (!(data.gender) || !(data.age)) {
-        window.location.href = '/details';
+      if (!data.gender || !data.age) {
+        window.location.href = "/details";
       } else {
-        window.location.href = '/';
+        window.location.href = "/";
       }
-
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
+      console.error("Login error:", error.response?.data || error.message);
     }
   };
+
+
 
   // 🔹 UI Rendering
   if (su) {

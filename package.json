@@ -1,0 +1,21 @@
+{
+  "name": "mediraksha",
+  "version": "1.0.0",
+  "description": "Healthcare application",
+  "homepage": "https://github.com/AbhijeetNagar56/Mediraksha#readme",
+  "bugs": {
+    "url": "https://github.com/AbhijeetNagar56/Mediraksha/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AbhijeetNagar56/Mediraksha.git"
+  },
+  "license": "ISC",
+  "author": "abhijeet",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "build":"npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "test": "echo \"Running the Mediraksha\" && npm run dev --prefix backend "
+  }
+}
